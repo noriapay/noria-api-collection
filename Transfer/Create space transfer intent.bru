@@ -1,0 +1,28 @@
+meta {
+  name: Create space transfer intent
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/v1/space-transfer/intent
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+body:json {
+  {
+    "amount": 42000,
+    "currency": "BRL",
+    "receiverSpaceId": "6f0c73b4-d2a9-4c81-b345-e7f8091a2345",
+    "description": "Move budget to Morty Smith field operations",
+    "tags": [
+      "morty",
+      "field-team"
+    ]
+  }
+}

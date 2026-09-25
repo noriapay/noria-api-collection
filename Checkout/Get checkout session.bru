@@ -1,0 +1,15 @@
+meta {
+  name: Get checkout session
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/v1/checkout-session/{{checkoutSessionId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}

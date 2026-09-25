@@ -1,0 +1,15 @@
+meta {
+  name: Resend one delivery
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/v1/webhook-delivery/{{deliveryId}}/resend
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}

@@ -1,0 +1,127 @@
+meta {
+  name: Noria API
+}
+
+docs {
+  Rotas da API Noria acessadas por projeto, via gateway. Toda requisição é assinada com a chave Ed25519 do projeto (Access-Id, Access-Time, Access-Signature), do jeito que o gateway verifica.
+
+  Preencha no environment: projectId, spaceId e privateKeyPem (o PEM que o dashboard baixa ao criar a chave do projeto; pode colar em uma linha só). baseUrl já aponta para development.
+
+  Nos corpos, "{{newId}}" vira um UUID novo a cada envio.
+}
+
+script:pre-request {
+  const nacl = require("./lib/nacl-fast.js");
+  const CryptoJS = require("crypto-js");
+
+  function required(name) {
+    const value = bru.getEnvVar(name);
+    if (!value) {
+      throw new Error(`environment variable ${name} is required`);
+    }
+    return String(value).trim();
+  }
+
+  function base64ToBytes(value) {
+    const binary = atob(value.replace(/\s+/g, ""));
+    const bytes = new Uint8Array(binary.length);
+    for (let index = 0; index < binary.length; index += 1) {
+      bytes[index] = binary.charCodeAt(index);
+    }
+    return bytes;
+  }
+
+  function bytesToBase64(bytes) {
+    let binary = "";
+    for (let index = 0; index < bytes.length; index += 1) {
+      binary += String.fromCharCode(bytes[index]);
+    }
+    return btoa(binary);
+  }
+
+  function utf8Bytes(value) {
+    const binary = unescape(encodeURIComponent(value));
+    const bytes = new Uint8Array(binary.length);
+    for (let index = 0; index < binary.length; index += 1) {
+      bytes[index] = binary.charCodeAt(index);
+    }
+    return bytes;
+  }
+
+  function seedFromPrivateKey(value) {
+    const bytes = base64ToBytes(value.replace(/-----[A-Z ]+-----/g, ""));
+    if (bytes.length === 48) {
+      return bytes.slice(16);
+    }
+    if (bytes.length === 64) {
+      return bytes.slice(0, 32);
+    }
+    if (bytes.length === 32) {
+      return bytes;
+    }
+    throw new Error("privateKeyPem must be the PKCS8 PEM downloaded from the dashboard or a raw Ed25519 seed");
+  }
+
+  function goQueryEscape(value) {
+    return encodeURIComponent(value)
+      .replace(/[!'()*]/g, (char) => `%${char.charCodeAt(0).toString(16).toUpperCase()}`)
+      .replace(/%20/g, "+");
+  }
+
+  function encodedQuery(search) {
+    if (!search) {
+      return "";
+    }
+    const pairs = search.replace(/^\?/, "").split("&").filter(Boolean).map((pair) => {
+      const separator = pair.indexOf("=");
+      const key = separator < 0 ? pair : pair.slice(0, separator);
+      const value = separator < 0 ? "" : pair.slice(separator + 1);
+      return [decodeURIComponent(key.replace(/\+/g, " ")), decodeURIComponent(value.replace(/\+/g, " "))];
+    });
+    pairs.sort((left, right) => (left[0] < right[0] ? -1 : left[0] > right[0] ? 1 : 0));
+    return pairs.map(([key, value]) => `${goQueryEscape(key)}=${goQueryEscape(value)}`).join("&");
+  }
+
+  function newId() {
+    const words = CryptoJS.lib.WordArray.random(16);
+    const hex = words.toString(CryptoJS.enc.Hex);
+    const variant = "89ab".charAt(parseInt(hex.charAt(16), 16) % 4);
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-${variant}${hex.slice(17, 20)}-${hex.slice(20, 32)}`;
+  }
+
+  function finalBody() {
+    const raw = req.getBody({ raw: true });
+    if (typeof raw !== "string" || !raw.trim()) {
+      return "";
+    }
+    const interpolated = bru.interpolate(raw).replace(/\{\{newId\}\}/g, () => newId());
+    const body = JSON.stringify(JSON.parse(interpolated));
+    req.setBody(body, { raw: true });
+    return body;
+  }
+
+  const projectId = required("projectId");
+  const spaceId = required("spaceId");
+  const keyPair = nacl.sign.keyPair.fromSeed(seedFromPrivateKey(required("privateKeyPem")));
+  const target = bru.interpolate(req.getUrl()).replace(/#.*$/, "").replace(/^[a-z][a-z0-9+.-]*:\/\/[^/?]+/i, "");
+  const separator = target.indexOf("?");
+  const url = {
+    pathname: separator < 0 ? target : target.slice(0, separator),
+    search: separator < 0 ? "" : target.slice(separator),
+  };
+  const accessId = `project/${projectId}/space/${spaceId}`;
+  const accessTime = new Date().toISOString();
+  const canonical = [
+    accessId,
+    accessTime,
+    req.getMethod().toUpperCase(),
+    url.pathname || "/",
+    encodedQuery(url.search),
+    CryptoJS.SHA256(finalBody()).toString(),
+  ].join("\n");
+  const signature = nacl.sign.detached(utf8Bytes(canonical), keyPair.secretKey);
+  req.setHeader("Access-Id", accessId);
+  req.setHeader("Access-Time", accessTime);
+  req.setHeader("Access-Signature", bytesToBase64(signature));
+  req.setHeader("X-Request-Id", newId());
+}

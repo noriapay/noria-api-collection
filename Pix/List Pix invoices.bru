@@ -1,0 +1,19 @@
+meta {
+  name: List Pix invoices
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/v1/pix-invoice?limit=20
+  body: none
+  auth: none
+}
+
+params:query {
+  limit: 20
+}
+
+headers {
+  Accept: application/json
+}

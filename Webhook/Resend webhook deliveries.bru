@@ -1,0 +1,21 @@
+meta {
+  name: Resend webhook deliveries
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/v1/webhook/{{webhookId}}/resend
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+body:json {
+  {
+    "since": "2026-09-01T00:00:00.000000+00:00"
+  }
+}

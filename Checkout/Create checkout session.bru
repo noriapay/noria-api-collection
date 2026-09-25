@@ -1,0 +1,39 @@
+meta {
+  name: Create checkout session
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/v1/checkout-session
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+body:json {
+  {
+    "externalId": "{{newId}}",
+    "currency": "BRL",
+    "lineItems": [
+      {
+        "name": "Portal fluid refill",
+        "quantity": 1,
+        "unitAmount": 24990,
+        "description": "One sealed container"
+      }
+    ],
+    "paymentMethodTypes": [
+      "pix"
+    ],
+    "origin": "https://shop.example",
+    "returnUrl": "https://shop.example/payment/return",
+    "returnState": "{{newId}}",
+    "metadata": {
+      "orderId": "{{newId}}"
+    }
+  }
+}

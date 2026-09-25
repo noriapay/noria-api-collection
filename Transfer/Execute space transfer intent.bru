@@ -1,0 +1,15 @@
+meta {
+  name: Execute space transfer intent
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/v1/space-transfer/intent/{{intentId}}/execute
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}

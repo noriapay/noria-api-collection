@@ -1,0 +1,19 @@
+meta {
+  name: List webhook deliveries
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/v1/webhook/{{webhookId}}/delivery?limit=20
+  body: none
+  auth: none
+}
+
+params:query {
+  limit: 20
+}
+
+headers {
+  Accept: application/json
+}

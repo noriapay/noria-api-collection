@@ -1,0 +1,19 @@
+meta {
+  name: List space transfers
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/v1/space-transfer?limit=20
+  body: none
+  auth: none
+}
+
+params:query {
+  limit: 20
+}
+
+headers {
+  Accept: application/json
+}

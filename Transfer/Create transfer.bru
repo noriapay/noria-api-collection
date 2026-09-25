@@ -1,0 +1,31 @@
+meta {
+  name: Create transfer
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/v1/transfer
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+body:json {
+  {
+    "externalId": "{{newId}}",
+    "amount": 85000,
+    "destination": {
+      "type": "pixKey",
+      "value": "summer.smith@example.com"
+    },
+    "description": "Summer Smith field expenses",
+    "tags": [
+      "smith-family",
+      "field-team"
+    ]
+  }
+}

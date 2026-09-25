@@ -1,0 +1,15 @@
+meta {
+  name: Get statement export
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/v1/statement-export/{{exportId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}

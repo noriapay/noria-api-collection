@@ -1,0 +1,32 @@
+meta {
+  name: Create Pix invoice
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/v1/pix-invoice
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+body:json {
+  {
+    "externalId": "{{newId}}",
+    "amount": 24990,
+    "expires": "2026-12-31T18:00:00.000000+00:00",
+    "payer": {
+      "name": "Rick Sanchez",
+      "taxId": "12345678901"
+    },
+    "description": "Portal fluid refill",
+    "tags": [
+      "citadel",
+      "portal-gun"
+    ]
+  }
+}

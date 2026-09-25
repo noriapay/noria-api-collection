@@ -1,0 +1,15 @@
+meta {
+  name: Get webhook signing key
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/v1/webhook-key
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}

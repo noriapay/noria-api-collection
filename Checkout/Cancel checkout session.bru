@@ -1,0 +1,15 @@
+meta {
+  name: Cancel checkout session
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/v1/checkout-session/{{checkoutSessionId}}/cancel
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
