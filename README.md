@@ -41,6 +41,12 @@ For us the deciding factor is **versioning**: a change to the collection becomes
 _commit_, not an invisible edit in someone's workspace. And because `.bru` files are text, any dev —
 or client — can read them, diff them and propose changes through the normal PR flow.
 
+### Prefer Postman?
+
+There's a generated Postman mirror in [`postman/`](postman/) — same requests, same examples, same
+Ed25519 signing. We build and maintain the collection in Bruno (this is the source of truth) and
+export to Postman for convenience; see [`postman/README.md`](postman/README.md).
+
 ## Installing Bruno
 
 Download it at **[usebruno.com/downloads](https://www.usebruno.com/downloads)** (Windows, macOS and
