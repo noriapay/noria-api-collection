@@ -3,11 +3,11 @@ meta {
 }
 
 docs {
-  Rotas da API Noria acessadas por projeto, via gateway. Toda requisição é assinada com a chave Ed25519 do projeto (Access-Id, Access-Time, Access-Signature), do jeito que o gateway verifica.
+  Noria API routes accessed per project, through the gateway. Every request is signed with the project's Ed25519 key (Access-Id, Access-Time, Access-Signature), exactly the way the gateway verifies it.
 
-  Preencha no environment: projectId, spaceId e privateKeyPem (o PEM que o dashboard baixa ao criar a chave do projeto; pode colar em uma linha só). baseUrl já aponta para development.
+  Fill in the environment: projectId, spaceId and privateKeyPem (the PEM the dashboard downloads when you create the project's key; you can paste it on a single line). baseUrl already points to development.
 
-  Nos corpos, "{{newId}}" vira um UUID novo a cada envio.
+  In the bodies, "{{newId}}" becomes a fresh UUID on every send.
 }
 
 script:pre-request {
